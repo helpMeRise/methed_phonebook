@@ -88,9 +88,9 @@ const data = [
     thead.insertAdjacentHTML('beforeend', `
       <tr>
         <th class="delete">Удалить</th>
-        <th>Имя</th>
-        <th>Фамилия</th>
-        <th>Телефон</th>
+        <th class="th-name">Имя</th>
+        <th class="th-surname">Фамилия</th>
+        <th class="th-phone">Телефон</th>
       </tr>
     `);
 
@@ -98,6 +98,7 @@ const data = [
 
     table.append(thead, tbody);
     table.tbody = tbody;
+    table.thead = thead;
 
     return table;
   };
@@ -184,9 +185,12 @@ const data = [
     app.append(header, main, footer);
 
     return {
+      table,
       list: table.tbody,
+      thead: table.thead,
       logo,
       btnAdd: buttonGroup.btns[0],
+      btnDel: buttonGroup.btns[1],
       formOverlay: form.overlay,
       form: form.form,
     };
@@ -194,6 +198,7 @@ const data = [
 
   const createRow = ({name: firstName, surname, phone}) => {
     const tr = document.createElement('tr');
+    tr.classList.add('contact');
 
     const tdDel = document.createElement('td');
     tdDel.classList.add('delete');
@@ -245,7 +250,14 @@ const data = [
     const app = document.querySelector(selectorApp);
     const phoneBook = renderPhoneBook(app, title);
 
-    const {list, logo, btnAdd, formOverlay, form} = phoneBook;
+    const {
+      list,
+      thead,
+      logo,
+      btnAdd,
+      formOverlay,
+      btnDel,
+    } = phoneBook;
 
     //  Функционал
     const allRow = renderContacts(list, data);
@@ -256,12 +268,44 @@ const data = [
       formOverlay.classList.add('is-visible');
     });
 
-    form.addEventListener('click', e => {
-      e.stopPropagation();
+    formOverlay.addEventListener('click', e => {
+      const target = e.target;
+      if (target === formOverlay || target.classList.contains('close')) {
+        formOverlay.classList.remove('is-visible');
+      }
     });
 
-    formOverlay.addEventListener('click', () => {
-      formOverlay.classList.remove('is-visible');
+    btnDel.addEventListener('click', e => {
+      document.querySelectorAll('.delete').forEach(del => {
+        del.classList.toggle('is-visible');
+      });
+    });
+
+    list.addEventListener('click', e => {
+      const target = e.target;
+
+      if (target.closest('.del-icon')) {
+        target.closest('.contact').remove();
+      }
+    });
+
+    const trSort = (filter) => {
+      const arr = Array.from(document.querySelectorAll('.contact'));
+      arr.sort((a, b) => {
+        const str = a.cells[filter].textContent;
+        const str2 = b.cells[filter].textContent;
+        return str.localeCompare(str2);
+      });
+      list.append(...arr);
+    };
+
+    thead.addEventListener('click', e => {
+      const target = e.target;
+      if (target.closest('.th-name')) {
+        trSort(1);
+      } else if (target.closest('.th-surname')) {
+        trSort(2);
+      }
     });
   };
 
