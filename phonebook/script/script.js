@@ -295,9 +295,11 @@ const removeStorage = phone => {
   const trSort = (filter, list) => {
     const arr = Array.from(document.querySelectorAll('.contact'));
     arr.sort((a, b) => {
-      const str = a.cells[filter].textContent;
-      const str2 = b.cells[filter].textContent;
-      return str.localeCompare(str2);
+      if (a.cells[filter].textContent < b.cells[filter].textContent) return -1;
+      if (a.cells[filter].textContent > b.cells[filter].textContent) return 1;
+      if (a.cells[3].textContent < b.cells[3].textContent) return -1;
+      if (a.cells[3].textContent > b.cells[3].textContent) return 1;
+      return 0;
     });
     list.append(...arr);
   };
