@@ -1,33 +1,32 @@
 'use strict';
 
-const data = [
-  {
-    name: 'Иван',
-    surname: 'Петров',
-    phone: '+79514545454',
-  },
-  {
-    name: 'Игорь',
-    surname: 'Семёнов',
-    phone: '+79999999999',
-  },
-  {
-    name: 'Семён',
-    surname: 'Иванов',
-    phone: '+79800252525',
-  },
-  {
-    name: 'Мария',
-    surname: 'Попова',
-    phone: '+79876543210',
-  },
-];
+
+const getStorage = key => {
+  if (localStorage.getItem(key) === null) {
+    return [];
+  } else {
+    return JSON.parse(localStorage.getItem(key));
+  }
+};
+
+const setStorage = (key, contact) => {
+  const data = getStorage('data');
+  localStorage.setItem(key, contact);
+  data.push(JSON.parse(localStorage.getItem(key)));
+  localStorage.setItem('data', JSON.stringify(data));
+};
+
+const removeStorage = phone => {
+  const data = getStorage('data');
+  data.forEach((contact, index) => {
+    if (contact.phone === phone) {
+      data.splice(index, 1);
+      localStorage.setItem('data', JSON.stringify(data));
+    }
+  });
+};
 
 {
-  const addContactData = contact => {
-    data.push(contact);
-    console.log('data: ', data);
-  };
   const createContainer = () => {
     const container = document.createElement('div');
     container.classList.add('container');
@@ -286,6 +285,8 @@ const data = [
       const target = e.target;
 
       if (target.closest('.del-icon')) {
+        removeStorage(target.closest('.contact')
+            .querySelector('a').textContent);
         target.closest('.contact').remove();
       }
     });
@@ -306,8 +307,10 @@ const data = [
       const target = e.target;
       if (target.closest('.th-name')) {
         trSort(1, list);
+        localStorage.setItem('sort', 1);
       } else if (target.closest('.th-surname')) {
         trSort(2, list);
+        localStorage.setItem('sort', 2);
       }
     });
   };
@@ -316,15 +319,16 @@ const data = [
     list.append(createRow(contact));
   };
 
-  const formControl = (form, list, closeModal, allRow, logo) => {
+  const formControl = (form, list, closeModal) => {
     form.addEventListener('submit', e => {
       e.preventDefault();
       const formData = new FormData(e.target);
 
       const newContact = Object.fromEntries(formData);
 
+      setStorage('contact', JSON.stringify(newContact));
+
       addContactPage(newContact, list);
-      addContactData(newContact);
       form.reset();
       closeModal();
     });
@@ -342,13 +346,15 @@ const data = [
       form,
       btnDel,
     } = renderPhoneBook(app, title);
+    console.log(getStorage('data'));
 
     //  Функционал
-    const allRow = renderContacts(list, data);
+    const allRow = renderContacts(list, getStorage('data'));
     const {closeModal} = modalControl(btnAdd, formOverlay);
     hoverRow(allRow, logo);
     deleteControl(btnDel, list);
     sort(thead, list);
+    trSort(localStorage.getItem('sort'), list);
     formControl(form, list, closeModal, allRow, logo);
   };
 
