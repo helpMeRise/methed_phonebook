@@ -1,3 +1,10 @@
+import image from '../img/icon.svg';
+
+export const createImageLogo = () => {
+  const img = new Image();
+  img.src = image;
+  return img;
+};
 
 export const createContainer = () => {
   const container = document.createElement('div');

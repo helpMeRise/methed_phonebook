@@ -1,5 +1,5 @@
-import {createRow} from './createElements.js';
-import storage from './storage.js';
+import {createRow} from './createElements';
+import storage from './storage';
 
 
 export const renderContacts = (elem, data) => {

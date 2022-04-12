@@ -1,6 +1,9 @@
-import storage from './modules/storage.js';
-import * as control from './modules/control.js';
-import {renderPhoneBook} from './modules/render.js';
+import storage from './script/storage';
+import * as control from './script/control';
+import {renderPhoneBook} from './script/render';
+
+import './scss/index.html';
+import './index.scss';
 
 
 {
